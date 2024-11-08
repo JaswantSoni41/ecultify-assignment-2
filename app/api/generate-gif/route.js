@@ -1,18 +1,24 @@
 import axios from 'axios';
 
 export async function POST(req) {
-  
   try {
+    // Extract image base64 from the request
     const { image_base64 } = await req.json();
-    const api_key = process.env.SEGMIND_MODEL_API_KEY;
-    console.log(api_key);
     
-    // const api_key = "SG_0bcdcc2cd0deb379";
-    const url = "https://api.segmind.com/v1/live-portrait";
+    // Securely access API key
+    const api_key = process.env.SEGMIND_MODEL_API_KEY;
+    if (!api_key) {
+      return new Response(
+        JSON.stringify({ error: 'API key is missing' }),
+        { status: 400 }
+      );
+    }
+
+    const url = 'https://api.segmind.com/v1/live-portrait';
 
     const data = {
       face_image: image_base64,
-      driving_video: "https://segmind-sd-models.s3.amazonaws.com/display_images/liveportrait-video.mp4",
+      driving_video: 'https://segmind-sd-models.s3.amazonaws.com/display_images/liveportrait-video.mp4',
       live_portrait_dsize: 512,
       live_portrait_scale: 2.3,
       video_frame_load_cap: 128,
@@ -28,17 +34,27 @@ export async function POST(req) {
       live_portrait_eyes_retargeting_multiplier: 1,
     };
 
+    // Send POST request to the Segmind API
     const response = await axios.post(url, data, {
       headers: { 'x-api-key': api_key },
-      responseType: 'arraybuffer', // Get video data as binary array buffer
+      responseType: 'arraybuffer', // Expecting binary video data
     });
 
+    // Convert binary data to base64
     const base64Video = Buffer.from(response.data, 'binary').toString('base64');
     const videoUrl = `data:video/mp4;base64,${base64Video}`;
 
+    // Return video URL in the response
     return new Response(JSON.stringify({ videoUrl }), { status: 200 });
+
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: 'Failed to generate video' }), { status: 500 });
+    // Improved error handling
+    console.error('Error generating video:', error);
+    const errorMessage = error.response?.data?.message || 'Failed to generate video';
+    
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500 }
+    );
   }
 }

@@ -1,4 +1,3 @@
-//2nd Version
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,10 +6,8 @@ import LoadingIndicator from "../components/LoadingIndicator";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import { RiAiGenerate } from "react-icons/ri";
 import { FaDownload } from "react-icons/fa6";
-import dotenv from 'dotenv';
 
 export default function Home() {
-  dotenv.config()
   const [image, setImage] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [gifUrl, setGifUrl] = useState("");
@@ -34,16 +31,22 @@ export default function Home() {
       });
 
       if (!response.ok) throw new Error("Failed to generate video");
+      
       const result = await response.json();
       setVideoUrl(result.videoUrl); // Set video URL for display
     } catch (error) {
-      console.error(error);
+      console.error("Error generating video:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleConvertToGif = async () => {
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
+    }
+
+    if (!videoUrl) return;
 
     setLoading(true);
 
@@ -60,7 +63,6 @@ export default function Home() {
         "output.gif"
       );
 
-      // Read the resulting GIF file
       const gifData = ffmpeg.FS("readFile", "output.gif");
       const gifBlob = new Blob([gifData.buffer], { type: "image/gif" });
       const gifUrl = URL.createObjectURL(gifBlob);
@@ -68,17 +70,14 @@ export default function Home() {
       setGifUrl(gifUrl);
     } catch (error) {
       console.error("Error converting video to GIF:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleDownloadGif = async () => {
-    // If GIF hasn't been generated, generate it first
-    if (!gifUrl) {
-      await handleConvertToGif();
-    }
+  const handleDownloadGif = () => {
+    if (!gifUrl) return; // If GIF hasn't been generated, exit
 
-    // Proceed with download once GIF is generated
     const link = document.createElement("a");
     link.href = gifUrl;
     link.download = "img-to-gif-output.gif";
@@ -86,10 +85,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (videoUrl) {
-      handleConvertToGif(); // Automatically call handleConvertToGif when videoUrl is available
+    if (videoUrl && !gifUrl) {
+      handleConvertToGif(); // Automatically generate GIF when videoUrl is available
     }
-  }, [videoUrl]);
+  }, [videoUrl, gifUrl]);
 
   return (
     <div className="h-fit min-w-[320px] max-w-[500px] flex flex-col items-center justify-center bg-white shadow-2xl p-10 rounded-lg">
@@ -97,7 +96,9 @@ export default function Home() {
         Real-Time GIF Generator
       </h1>
 
-      <p className="text-black text-xl mb-3 text-center">Choose Image by Clicking add image or Click a photo</p>
+      <p className="text-black text-xl mb-3 text-center">
+        Choose Image by Clicking add image or Click a photo
+      </p>
       <ImageUpload onImageSelected={setImage} />
 
       <div className="flex flex-col md:flex-row justify-center items-center w-full h-full gap-2">
@@ -118,6 +119,7 @@ export default function Home() {
             <span className="hidden md:flex text-xl">Generate GIF</span>
           </button>
         </div>
+
         {loading && <LoadingIndicator />}
 
         <div className="flex flex-col items-center justify-center">
@@ -128,8 +130,10 @@ export default function Home() {
               className="w-64 h-auto rounded-lg shadow-lg my-4"
             />
           )}
+
           {videoUrl && (
-            <button disabled={loading} hidden={loading}
+            <button
+              disabled={loading || !gifUrl}
               onClick={handleDownloadGif}
               className="bg-purple-600 text-white mt-4 p-4 rounded-full text-3xl flex justify-center items-center gap-2"
             >
