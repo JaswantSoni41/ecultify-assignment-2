@@ -1,9 +1,13 @@
 import axios from 'axios';
 
 export async function POST(req) {
+  
   try {
     const { image_base64 } = await req.json();
-    const api_key = "SG_0bcdcc2cd0deb379";
+    const api_key = process.env.SEGMIND_MODEL_API_KEY;
+    console.log(api_key);
+    
+    // const api_key = "SG_0bcdcc2cd0deb379";
     const url = "https://api.segmind.com/v1/live-portrait";
 
     const data = {
