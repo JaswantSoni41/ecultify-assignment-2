@@ -1,5 +1,10 @@
 # Ecultify Advertising Web-App Developer Assignment - 2 RealTime - GIF maker 
 
+
+https://github.com/user-attachments/assets/b0df6900-6803-40e1-ac18-e6239f2f568b
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Project Overview
