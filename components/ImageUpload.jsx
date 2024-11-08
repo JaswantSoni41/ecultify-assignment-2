@@ -37,7 +37,7 @@ const ImageUpload = ({ onImageSelected }) => {
               className="w-64 h-48 rounded-lg border-2 border-gray-300 mb-5"
             />
             <div className="flex flex-col md:flex-row justify-center items-center gap-2">
-            <button onClick={()=>captureImage} className="bg-blue-500 text-white px-4 py-2 rounded-full inline-flex justify-center items-center gap-1 text-3xl">
+            <button onClick={captureImage} className="bg-blue-500 text-white px-4 py-2 rounded-full inline-flex justify-center items-center gap-1 text-3xl">
             <TbCapture /> <span className='hidden md:inline-block text-xl'>Capture</span>
             </button>
             <button onClick={() => setWebcamOpen(false)} className="bg-red-500 text-white px-4 py-2 rounded-full flex justify-center items-center gap-1 text-3xl">
