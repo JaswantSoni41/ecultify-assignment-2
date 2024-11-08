@@ -12,6 +12,8 @@ Here it's my 2nd assiagnment which I completed Successfully. Here the poject was
 
 Here I made this website very clean and maintains its responsiveness and also some of the custom components are there in the components folder namely ImageUpload.jsx and LoadingIndicator.jsx.
 
+Here its a [Link](https://ecultify-assignment-2.netlify.app/) of the project which was deployed on the Netlify
+
 ## Table of Contents
 - [Technologies](#technologies)
 - [Installation Process](#installation)
